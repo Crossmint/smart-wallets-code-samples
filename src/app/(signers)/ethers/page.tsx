@@ -13,55 +13,61 @@ import NFT from "../../components/NFT";
 
 const userIdentifier = { email: "danny+3@crossmint.io" };
 
-const createAAWalletHelper = async () => {
-  const xm = CrossmintAASDK.init({
-    apiKey: process.env.NEXT_PUBLIC_API_KEY || "",
-  });
-
-  const getSigner = () => {
-    const savedMnemonic = localStorage.getItem("mnemonic");
-    if (savedMnemonic) {
-      console.log("loading from localStorage");
-      return Wallet.fromMnemonic(savedMnemonic);
-    } else {
-      console.log("generating new random wallet");
-      // Generate a random Wallet object.
-      const ethersSigner = Wallet.createRandom();
-
-      // Save the mnemonic phrase
-      let mnemonic = ethersSigner.mnemonic.phrase;
-
-      // log the mnemonic phrase, you should save it securely
-      console.log("mnemonic: ", mnemonic);
-
-      // save to localStorage
-      localStorage.setItem("mnemonic", mnemonic);
-
-      return ethersSigner;
-    }
-  };
-
-  const walletInitParams = {
-    signer: getSigner(),
-  };
-
-  const wallet = await xm.getOrCreateWallet(
-    userIdentifier,
-    Blockchain.POLYGON,
-    walletInitParams
-  );
-
-  console.log({ walletAddress: await wallet.getAddress() });
-
-  return wallet;
-};
-
-export default function Home() {
+const Page: React.FC = () => {
   const [wallet, setWallet] = useState<EVMAAWallet | undefined>(undefined);
   const [balance, setBalance] = useState<string | undefined>(undefined);
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [nfts, setNfts] = useState<[] | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const createAAWalletHelper = async () => {
+    if (typeof window !== "undefined") {
+      const xm = CrossmintAASDK.init({
+        apiKey: process.env.NEXT_PUBLIC_API_KEY || "",
+      });
+
+      const getSigner = () => {
+        const savedMnemonic = localStorage.getItem("mnemonic");
+        if (savedMnemonic) {
+          console.log("loading from localStorage");
+          return Wallet.fromMnemonic(savedMnemonic);
+        } else {
+          console.log("generating new random wallet");
+          // Generate a random Wallet object.
+          const ethersSigner = Wallet.createRandom();
+
+          // Save the mnemonic phrase
+          let mnemonic = ethersSigner.mnemonic.phrase;
+
+          // log the mnemonic phrase, you should save it securely
+          console.log("mnemonic: ", mnemonic);
+
+          // save to localStorage
+          localStorage.setItem("mnemonic", mnemonic);
+
+          return ethersSigner;
+        }
+      };
+
+      const walletInitParams = {
+        signer: getSigner(),
+      };
+
+      const wallet = await xm.getOrCreateWallet(
+        userIdentifier,
+        Blockchain.POLYGON,
+        walletInitParams
+      );
+
+      console.log({ walletAddress: await wallet.getAddress() });
+
+      return wallet;
+    } else {
+      // Handle the server-side rendering case
+      console.log("We're on the server-side. Can't access localStorage.");
+      return undefined;
+    }
+  };
 
   const createAAWallet = async () => {
     setLoading(true);
@@ -162,4 +168,6 @@ export default function Home() {
       )}
     </div>
   );
-}
+};
+
+export default Page;

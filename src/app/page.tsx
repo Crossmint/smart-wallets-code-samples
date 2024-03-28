@@ -4,21 +4,13 @@ const Page: React.FC = () => {
   return (
     <div className="flex flex-wrap justify-center">
       <Card
-        href="/signers/fireblocks"
+        href="/fireblocks"
         title="Fireblocks"
         desc="Using a fireblocks NCW signer"
       />
-      <Card
-        href="/signers/web3auth"
-        title="Web3Auth"
-        desc="Using a web3auth signer"
-      />
-      <Card href="/signers/wagmi" title="WAGMI" desc="Using a wagmi signer" />
-      <Card
-        href="/signers/ethers"
-        title="Ethers"
-        desc="Using an ethers signer"
-      />
+      <Card href="/web3auth" title="Web3Auth" desc="Using a web3auth signer" />
+      <Card href="/wagmi" title="WAGMI" desc="Using a wagmi signer" />
+      <Card href="/ethers" title="Ethers" desc="Using an ethers signer" />
     </div>
   );
 };

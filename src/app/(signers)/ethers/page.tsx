@@ -1,17 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   CrossmintAASDK,
   Blockchain,
   EVMAAWallet,
 } from "@crossmint/client-sdk-aa";
-import { useState } from "react";
 import { ethers } from "ethers";
 const { parseUnits, formatEther } = ethers.utils;
 import { Wallet } from "ethers";
 import NFT from "../../components/NFT";
 
-const userIdentifier = { email: "danny+3@crossmint.io" };
+//
 
 const Page: React.FC = () => {
   const [wallet, setWallet] = useState<EVMAAWallet | undefined>(undefined);
@@ -19,6 +19,12 @@ const Page: React.FC = () => {
   const [address, setAddress] = useState<string | undefined>(undefined);
   const [nfts, setNfts] = useState<[] | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
+
+  useEffect(() => {
+    const email = localStorage.getItem("email") || "";
+    setEmail(email);
+  }, []);
 
   const createAAWalletHelper = async () => {
     if (typeof window !== "undefined") {
@@ -27,7 +33,7 @@ const Page: React.FC = () => {
       });
 
       const getSigner = () => {
-        const savedMnemonic = localStorage.getItem("mnemonic");
+        const savedMnemonic = localStorage.getItem(`mnemonic-${email}`);
         if (savedMnemonic) {
           console.log("loading from localStorage");
           return Wallet.fromMnemonic(savedMnemonic);
@@ -43,7 +49,7 @@ const Page: React.FC = () => {
           console.log("mnemonic: ", mnemonic);
 
           // save to localStorage
-          localStorage.setItem("mnemonic", mnemonic);
+          localStorage.setItem(`mnemonic-${email}`, mnemonic);
 
           return ethersSigner;
         }
@@ -54,7 +60,7 @@ const Page: React.FC = () => {
       };
 
       const wallet = await xm.getOrCreateWallet(
-        userIdentifier,
+        { email },
         Blockchain.POLYGON,
         walletInitParams
       );
@@ -71,6 +77,7 @@ const Page: React.FC = () => {
 
   const createAAWallet = async () => {
     setLoading(true);
+    localStorage.setItem("email", email);
     const wallet = await createAAWalletHelper();
     console.log(wallet);
     setWallet(wallet);
@@ -109,9 +116,18 @@ const Page: React.FC = () => {
 
   return (
     <div>
+      <div className="p-5">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+          className="p-2 border rounded w-96"
+        />
+      </div>
       {/* Wallet not set section */}
       {!wallet && (
-        <div>
+        <div className="p-5">
           <div>Wallet not created</div>
           <div>
             <button

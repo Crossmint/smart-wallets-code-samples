@@ -14,7 +14,7 @@ const Navigation: React.FC = () => {
           priority={true}
         />
       </Link>
-      <div className="font-mono">Smart Wallets Sample Code</div>
+      <div className="font-mono">Smart Wallet Demo</div>
     </div>
   );
 };

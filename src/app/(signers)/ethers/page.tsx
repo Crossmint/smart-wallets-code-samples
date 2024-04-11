@@ -38,6 +38,7 @@ const Page: React.FC = () => {
       });
 
       const getSigner = () => {
+        //return new ethers.providers.Web3Provider(window.ethereum);
         const savedMnemonic = localStorage.getItem(`mnemonic-${email}`);
         if (savedMnemonic) {
           console.log("loading from localStorage");
@@ -50,13 +51,19 @@ const Page: React.FC = () => {
           // Save the mnemonic phrase
           let mnemonic = ethersSigner.mnemonic.phrase;
 
+          const wallet = Wallet.fromMnemonic(mnemonic);
+
           // log the mnemonic phrase, you should save it securely
           console.log("mnemonic: ", mnemonic);
 
           // save to localStorage
           localStorage.setItem(`mnemonic-${email}`, mnemonic);
 
-          return ethersSigner;
+          const provider = new ethers.providers.JsonRpcProvider(
+            process.env.NEXT_PUBLIC_RPC_URL
+          );
+
+          return new Wallet(wallet.privateKey, provider);
         }
       };
 

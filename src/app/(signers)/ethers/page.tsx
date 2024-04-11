@@ -9,9 +9,9 @@ import {
 import { ethers } from "ethers";
 const { parseUnits, formatEther } = ethers.utils;
 import { Wallet } from "ethers";
+import SignUpForm from "../../components/SignUpForm";
+import WalletInfo from "../../components/WalletInfo";
 import NFT from "../../components/NFT";
-
-//
 
 const Page: React.FC = () => {
   const [wallet, setWallet] = useState<EVMAAWallet | undefined>(undefined);
@@ -25,6 +25,11 @@ const Page: React.FC = () => {
     const email = localStorage.getItem("email") || "";
     setEmail(email);
   }, []);
+
+  useEffect(() => {
+    getAddress();
+    getBalance();
+  }, [wallet]);
 
   const createAAWalletHelper = async () => {
     if (typeof window !== "undefined") {
@@ -75,7 +80,7 @@ const Page: React.FC = () => {
     }
   };
 
-  const createAAWallet = async () => {
+  const createWallet = async () => {
     setLoading(true);
     localStorage.setItem("email", email);
     const wallet = await createAAWalletHelper();
@@ -115,72 +120,21 @@ const Page: React.FC = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
-      <div className="p-5">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
-          className="p-2 border rounded w-96"
-        />
-      </div>
-      {/* Wallet not set section */}
+    <div className="grid grid-cols-5 bg-gray-200 p-5">
       {!wallet && (
-        <div className="p-5">
-          <div>Wallet not created</div>
-          <div>
-            <button
-              onClick={createAAWallet}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Create or Load AA Wallet
-            </button>
-          </div>
-        </div>
+        <SignUpForm
+          email={email}
+          setEmail={setEmail}
+          createWallet={createWallet}
+        />
       )}
-      {/* Wallet set section */}
+
       {wallet && (
-        <>
-          <div className="p-5">
-            <button
-              onClick={getAddress}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Get Address
-            </button>
-            {address && <div>Address: {address}</div>}
-          </div>
-          <div className="p-5">
-            <button
-              onClick={getBalance}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Get Balance
-            </button>
-            {balance && <div>Balance: {balance}</div>}
-          </div>
-          <div className="p-5">
-            <button
-              onClick={getNFTs}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Get NFTs
-            </button>
-            {nfts && (
-              <div>
-                {nfts && (
-                  <div>
-                    <h2>NFTs:</h2>
-                    {nfts.map((nft, index) => (
-                      <NFT nft={nft} key={index} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </>
+        <WalletInfo
+          email={email}
+          address={address || ""}
+          balance={balance || ""}
+        />
       )}
     </div>
   );
